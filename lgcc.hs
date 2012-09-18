@@ -30,9 +30,8 @@ main = do
   args <- getArgs
   when (null args) help
   let (comp, args') = (head &&& tail >>> first matchComp) args
-      matchComp s
-        | s == "c" || s == "cpp" = s
-        | otherwise = ""
+      compilers = [("c", "gcc"), ("cpp", "g++")]
+      matchComp = maybe "" id . flip lookup compilers
   when (null comp) help
   newArgs <- forM args'
     (\arg -> do
