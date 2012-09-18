@@ -53,4 +53,3 @@ main = do
           pn <- getProgName
           putStrLn (pn ++ " <c|cpp> [compiler args]")
           exitFailure
-                                      
