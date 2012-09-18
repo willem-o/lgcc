@@ -7,15 +7,15 @@
 ----
 module Main where
 
-import Data.List (intercalate, isSuffixOf, isPrefixOf, delete)
 import Control.Applicative ((<$>))
-import Control.Monad (when, void)
 import Control.Arrow ((&&&), (>>>), first)
+import Control.Monad (when, void)
+import Data.List (intercalate, isSuffixOf, isPrefixOf, delete)
 import Data.Traversable (sequenceA, forM)
-import System.Environment (getArgs, getProgName)
-import System.Directory (doesFileExist)
-import System.Exit (exitFailure)
 import System.Cmd (rawSystem)
+import System.Directory (doesFileExist)
+import System.Environment (getArgs, getProgName)
+import System.Exit (exitFailure)
 import System.IO (hPutStrLn, stderr)
 
 unliterate :: String -> String
