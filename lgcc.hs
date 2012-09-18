@@ -1,5 +1,5 @@
 ----
--- Licence: GPLv3
+-- Licence: BSD
 -- Author: Willem Obbens
 -- Status: hardly tested, use at your own risk
 -- Description: wrapper around gcc haskell-style literate programming
