@@ -35,25 +35,20 @@ main = do
   when (null compiler) help
   tempFiles <- newIORef []
   newArgs <- forM args'
-    (\arg ->
-      if isLiterate arg
-        then do
-          e <- doesFileExist arg
-          when (not e) (reportError (arg ++ " does not exist."))
-          let (front, suffix) = break (== '.') arg
-              newArg = front ++ delete 'l' suffix
-          e' <- doesFileExist newArg
-          when e' (reportError (newArg ++ " already exists."))
-          unliterate <$> readFile arg >>= writeFile newArg
-          modifyIORef tempFiles (newArg:)
-          return newArg
-        else return arg)
+    (\arg -> if isLiterate arg
+      then do
+        e <- doesFileExist arg
+        when (not e) (reportError (arg ++ " does not exist."))
+        let (front, suffix) = break (== '.') arg
+            newArg = front ++ delete 'l' suffix
+        newArg `whenExists` reportError (newArg ++ " already exists.")
+        unliterate <$> readFile arg >>= writeFile newArg
+        modifyIORef tempFiles (newArg:)
+        return newArg
+      else return arg)
   putStrLn (compiler ++ intercalate " " newArgs)
   void (rawSystem compiler newArgs)
-  readIORef tempFiles >>=
-    mapM_ (liftA2 (>>=) doesFileExist (flip when . removeFile))
-  where reportError msg = hPutStrLn stderr msg >> exitFailure
-        help = do
-          pn <- getProgName
-          putStrLn (pn ++ " <c|cpp> [compiler args]")
-          exitFailure
+  readIORef tempFiles >>= mapM_ (\f -> f `whenExists` removeFile f)
+  where whenExists f a = doesFileExist f >>= flip when a
+        reportError msg = hPutStrLn stderr msg >> exitFailure
+        help = getProgName >>= putStrLn . (++ " <c|cpp> [compiler args]") >> exitFailure
