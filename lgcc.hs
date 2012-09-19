@@ -9,7 +9,7 @@ module Main where
 
 import Control.Applicative ((<$>), liftA2)
 import Control.Arrow ((&&&), (>>>), first)
-import Control.Monad (when, void, sequence, forM, forM_)
+import Control.Monad (when, void, sequence, forM, forM_, join)
 import Data.IORef (newIORef, modifyIORef, readIORef)
 import Data.List (intercalate, isSuffixOf, isPrefixOf, delete)
 import System.Cmd (rawSystem)
@@ -48,7 +48,7 @@ main = do
       else return arg)
   putStrLn (compiler ++ intercalate " " newArgs)
   void (rawSystem compiler newArgs)
-  readIORef tempFiles >>= mapM_ (\f -> f `whenExists` removeFile f)
+  readIORef tempFiles >>= mapM_ (join (flip whenExists . removeFile))
   where whenExists f a = doesFileExist f >>= flip when a
         reportError msg = hPutStrLn stderr msg >> exitFailure
         help = getProgName >>= putStrLn . (++ " <c|cpp> [compiler args]") >> exitFailure
