@@ -48,7 +48,9 @@ main = do
       else return arg)
   putStrLn (compiler ++ intercalate " " newArgs)
   void (rawSystem compiler newArgs)
-  readIORef tempFiles >>= mapM_ (join (flip whenExists . removeFile))
+  deleteFiles tempFiles
   where whenExists f a = doesFileExist f >>= flip when a
         reportError msg = hPutStrLn stderr msg >> exitFailure
         help = getProgName >>= putStrLn . (++ " <c|cpp> [compiler args]") >> exitFailure
+        deleteFiles tempFiles = readIORef tempFiles >>=
+          mapM_ (join (flip whenExists . removeFile))
